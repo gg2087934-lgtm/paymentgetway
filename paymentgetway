@@ -1,0 +1,102 @@
+import random
+
+transaction_history = []
+
+
+class Payment:
+    def __init__(self, amount):
+        self.amount = amount
+        self.status = "Pending"
+        self.transaction_id = random.randint(1000, 9999)
+
+    def receipt(self, method):
+        print("\n------ RECEIPT ------")
+        print("Transaction ID:", self.transaction_id)
+        print("Payment Method:", method)
+        print("Amount:", self.amount)
+        print("Status:", self.status)
+
+        transaction_history.append(
+            f"ID:{self.transaction_id} | {method} | {self.amount} | {self.status}"
+        )
+
+
+class UPI(Payment):
+    def __init__(self, amount, upi_id):
+        super().__init__(amount)
+        self.upi_id = upi_id
+
+    def pay(self):
+        if "@" in self.upi_id:
+            self.status = "Success"
+            print("UPI Payment Successful")
+        else:
+            self.status = "Failed"
+            print("Invalid UPI ID")
+        self.receipt("UPI")
+
+
+class Card(Payment):
+    def __init__(self, amount, card_number, cvv):
+        super().__init__(amount)
+        self.card_number = card_number
+        self.cvv = cvv
+
+    def pay(self):
+        if len(str(self.card_number)) >= 8 and len(str(self.cvv)) == 3:
+            self.status = "Success"
+            print("Card Payment Successful")
+        else:
+            self.status = "Failed"
+            print("Invalid Card Details")
+        self.receipt("Card")
+
+
+class Cash(Payment):
+    def __init__(self, amount, cash_given):
+        super().__init__(amount)
+        self.cash_given = cash_given
+
+    def pay(self):
+        if self.cash_given >= self.amount:
+            self.status = "Success"
+            balance = self.cash_given - self.amount
+            print("Cash Payment Successful")
+            print("Balance Returned:", balance)
+        else:
+            self.status = "Failed"
+            print("Insufficient Cash")
+        self.receipt("Cash")
+
+
+print("===== PAYMENT GATEWAY SYSTEM =====")
+amount = int(input("Enter Amount: "))
+
+print("\n1. UPI")
+print("2. Card")
+print("3. Cash")
+choice = int(input("Choose Payment Method: "))
+
+if choice == 1:
+    upi_id = input("Enter UPI ID: ")
+    payment = UPI(amount, upi_id)
+    payment.pay()
+
+elif choice == 2:
+    card_number = input("Enter Card Number: ")
+    cvv = input("Enter CVV: ")
+    payment = Card(amount, card_number, cvv)
+    payment.pay()
+
+elif choice == 3:
+    cash_given = int(input("Enter Cash Given: "))
+    payment = Cash(amount, cash_given)
+    payment.pay()
+
+else:
+    print("Invalid Choice")
+
+
+print("\n------ TRANSACTION HISTORY ------")
+for i in transaction_history:
+    print(i)
